@@ -173,3 +173,24 @@ data['Avg Salary'] = data['Avg Salary'].astype('int')
 
 # print(data[data['Job Title'].isin(['Data Scientist'])])
 # print(data[data['Avg Salary'].between(100000,150000)])
+
+data_copy = data.set_index('Job Title')
+# print(data_copy.loc['Data Scientist'])
+
+data['Job Title'] = data['Job Title'].replace("Data Scientist", "Data Specialist")
+# print(data[data['Job Title'] == 'Data Specialist'])
+# print(data.columns)
+data = data.drop(columns = ['Python',
+       'spark', 'aws', 'excel', 'sql', 'sas', 'keras', 'pytorch', 'scikit',
+       'tensor', 'hadoop', 'tableau', 'bi', 'flink', 'mongo', 'google_an'])
+# print(data.columns)
+
+data = data.drop(index=[0])
+# print(data)
+
+hqs = data.pop('Headquarters')
+# print(hqs)
+# print(data.columns)
+
+del data['Degree']
+# print(data.columns)
