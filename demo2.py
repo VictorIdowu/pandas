@@ -91,4 +91,85 @@ def pass_or_fail(num):
     return 'Fail'
 
 res = scores.apply(pass_or_fail)
-print(res.value_counts())
+# print(res.value_counts())
+
+# //// Map Method
+stock_symbols = {"Acme Corp":"ACMC","Anton Computers":"ANT","Maximo Construction":"MCX"}
+stock_prices = {"ACMC":29,"MCX":15,"ANT":48}
+
+symbol_series = Series(stock_symbols)
+prices_series = Series(stock_prices)
+
+# print(symbol_series.map(prices_series))
+
+# ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+data = pd.read_csv('data_cleaned_2021.csv')
+
+data.set_index('index', inplace=True)
+data.index.name = "Job ID"
+# print(data.head(10))
+# print(data.tail())
+# print(data.axes)
+# print(data.info())
+# print(data['Salary Estimate'])
+# print(data.Location)
+# print(data.size)
+
+new_data = data[['Job Title','Salary Estimate','Company Name','Location','Size']]
+# print(new_data)
+
+# print(data[['Job Title','Lower Salary', 'Upper Salary', 'Avg Salary(K)']])
+
+def parse_salary(salary_str):
+  if ':' in salary_str:
+    salary_range = salary_str.split(':')[1].strip()
+  
+  salary_range = salary_str.split(' ')[0]
+  if "-" in salary_range:
+    min_salary,max_salary = salary_range.split('-')
+  else:
+    min_salary = max_salary = salary_range
+  
+  def clean_and_convert(salary):
+    try:
+      return float(salary.replace('$', '').split('K')[0]) *1000
+    except ValueError:
+      return 0
+  
+  min_salary = clean_and_convert(min_salary)
+  max_salary = clean_and_convert(max_salary)
+
+  avg_salary = (min_salary + max_salary)/2
+
+  return Series([min_salary,max_salary,avg_salary])
+
+# for salary_str in data['Salary Estimate']:
+#   print(parse_salary(salary_str))
+
+data[['Min Salary','Max Salary','Avg Salary']] = data['Salary Estimate'].apply(parse_salary)
+# print(data[['Min Salary','Max Salary','Avg Salary']])
+
+# print(data['Job Title'].value_counts())
+
+data['Max Salary'] = data['Max Salary'].astype('int')
+data['Min Salary'] = data['Min Salary'].astype('int')
+data['Avg Salary'] = data['Avg Salary'].astype('int')
+
+# print(data['Min Salary'].dtype)
+# print(data['Max Salary'].dtype)
+# print(data['Avg Salary'].dtype)
+
+# print(data.sort_values("Avg Salary", ascending=False))
+# print(data.sort_values(["Rating","Max Salary"], ascending=False)[["Max Salary","Rating"]].head(30))
+
+# Filter/////
+# print(data[data['Job Title'] == 'Data Scientist'])
+# print(data[data['Max Salary'] > 100000]) 
+# print(data[data['Founded'] > 2015]) 
+# print(data[data['Rating'] >= 4]) 
+# print(data[(data['Job Title'] == 'Data Scientist') & (data['Max Salary'] > 100000) & (data['Rating'] >= 4)]) 
+# print(data[(data['Max Salary'] > 100000) | (data['Rating'] > 4.5)]) 
+
+# print(data[data['Job Title'].isin(['Data Scientist'])])
+# print(data[data['Avg Salary'].between(100000,150000)])
